@@ -2,6 +2,7 @@ import { LOGIN, LOGOUT } from './types';
 import { SERVER_IP } from '../../private'
 
 const finishLogin = (email, token) => {
+    console.log(email, token, " Email then token...")
     return {
         type: LOGIN,
         payload: {
@@ -24,6 +25,7 @@ export const loginUser = (email, password) => {
             },
         }).then(response => response.json())
         .then(response => {
+            console.log(response, " Response from login...")
             if (response.success) {
                 dispatch(finishLogin(response.email, response.token));
             }

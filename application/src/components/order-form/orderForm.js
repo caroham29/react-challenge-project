@@ -20,7 +20,7 @@ class OrderForm extends Component {
     }
 
     menuItemChosen(event) {
-        this.setState({ item: event.target.value });
+        this.setState({ order_item: event.target.value });
     }
 
     menuQuantityChosen(event) {
@@ -28,6 +28,7 @@ class OrderForm extends Component {
     }
 
     submitOrder(event) {
+        console.log(this.state.order_item, "1", this.state.quantity,"2", this.props)
         event.preventDefault();
         if (this.state.order_item === "") return;
         fetch(ADD_ORDER_URL, {
