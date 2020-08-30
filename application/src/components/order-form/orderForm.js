@@ -43,7 +43,7 @@ class OrderForm extends Component {
             body: JSON.stringify({
                 order_item: this.state.order_item,
                 quantity: this.state.quantity,
-                ordered_by: this.props.auth.token,
+                ordered_by: this.props.auth.token, //Token must exist for page to load...
             }),
             headers: {
                 'Content-Type': 'application/json'
