@@ -1,8 +1,15 @@
 import React from "react";
+import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
+import { logoutUser } from '../../redux/actions/authActions'
+
 import "./nav.css";
 
 const Nav = (props) => {
+    const clearReduxUser = () => {
+        props.dispatch(logoutUser())
+    }
+
     return (
         <div className="nav-strip">
             <Link to={"/order"} className="nav-link">
@@ -15,7 +22,7 @@ const Nav = (props) => {
                     <label className="nav-label">View Orders</label>
                 </div>
             </Link>
-            <Link to={"/login"} className="nav-link">
+            <Link onClick={() => clearReduxUser()} to={"/login"} className="nav-link">
                 <div className="nav-link-style">
                     <label className="nav-label">Log Out</label>
                 </div>
@@ -24,4 +31,8 @@ const Nav = (props) => {
     );
 }
 
-export default Nav;
+function mapStateToProps () {
+  return {}
+}
+
+export default connect(mapStateToProps)(Nav)

@@ -3,7 +3,7 @@ import LoginForm from './login-form/loginForm';
 import './login.css';
 
 class Login extends Component {
-  
+
   render() {
     return (
       <div className="main-body">
@@ -16,4 +16,5 @@ class Login extends Component {
   }
 }
 
-export default Login;
+
+export default Login
