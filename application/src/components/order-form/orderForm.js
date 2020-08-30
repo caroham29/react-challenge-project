@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Template } from '../../components';
+import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { SERVER_IP } from '../../private';
 import './orderForm.css';
@@ -14,8 +15,15 @@ class OrderForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            blockPage: false,
             order_item: "",
             quantity: "1"
+        }
+    }
+
+    componentDidMount() {
+        if ( !this.props.auth.token ) { //Redirect if token not found
+            this.setState({ blockPage: true })
         }
     }
 
@@ -28,7 +36,6 @@ class OrderForm extends Component {
     }
 
     submitOrder(event) {
-        console.log(this.state.order_item, "1", this.state.quantity,"2", this.props)
         event.preventDefault();
         if (this.state.order_item === "") return;
         fetch(ADD_ORDER_URL, {
@@ -48,6 +55,9 @@ class OrderForm extends Component {
     }
 
     render() {
+        if (!!this.state.blockPage) {
+            return <Redirect to="/"/>
+        }
         return (
             <Template>
                 <div className="form-wrapper">

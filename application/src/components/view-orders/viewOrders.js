@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
 import { Template } from '../../components';
 import { SERVER_IP } from '../../private';
 import './viewOrders.css';
@@ -36,7 +36,7 @@ class ViewOrders extends Component {
             });
 
         setTimeout(() => {
-            if ( !this.props.auth.token ) {
+            if ( !this.props.auth.token ) { //Redirect if token not found, otherwise load page
                this.setState({ blockPage: true })
             } else {
                this.setState({ loading: false })
