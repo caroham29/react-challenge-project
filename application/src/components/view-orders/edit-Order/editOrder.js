@@ -8,6 +8,8 @@ class EditOrder extends Component {
         this.state = {
             blockPage: false,
             order_item: "",
+            order_item_original:"",
+            quantity_original:"",
             quantity: "1",
             id : null,
             ordered_by:'',
@@ -30,7 +32,9 @@ class EditOrder extends Component {
             ordered_by: this.props.orderItem.ordered_by,
             id: this.props.orderItem._id,
             shortId: this.props.orderItem._id.slice(0,7) + '...',
-            created: this.props.orderItem.createdAt
+            created: this.props.orderItem.createdAt,
+            order_item_original: this.props.orderItem.order_item,
+            quantity_original: this.props.orderItem.quantity,
         })
     }
 

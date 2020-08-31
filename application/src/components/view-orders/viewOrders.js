@@ -20,8 +20,7 @@ class ViewOrders extends Component {
             email: null,
             token: null
         },
-        orderItem: {}
-
+        orderItem: {},
     }
 
     passedFunction = () => {
@@ -32,7 +31,7 @@ class ViewOrders extends Component {
         this.setState({ orderItem:obj,  showEditMod : true })
     }
 
-    saveEdit = ({  id, ordered_by, quantity, order_item }) => {
+    saveEdit = ({  id, ordered_by, quantity, order_item, quantity_original, order_item_original }) => {
         this.setState((state,props) => (
            {
             showOrders: state.showOrders,
@@ -40,7 +39,7 @@ class ViewOrders extends Component {
                         if (it._id === id) {
                             acc.push( Object.assign(
                                 it,
-                                { _id: id, quantity, order_item }
+                                { quantity, order_item }
                             ))
                         } else {
                             acc.push(it);
@@ -66,7 +65,28 @@ class ViewOrders extends Component {
         })
         .then(res => res.json())
         .then(response => console.log("Success", JSON.stringify(response)))
-        .catch(error => console.error(error));
+        .catch((error) => {
+            //If error reset state to original qty and item
+            this.setState((state,props) => (
+               {
+                showOrders: state.showOrders,
+                orders: state.orders.reduce((acc,it) => {
+                            if (it._id === id) {
+                                acc.push( Object.assign(
+                                    it,
+                                    { quantity: quantity_original, order_item: order_item_original }
+                                ))
+                            } else {
+                                acc.push(it);
+                            }
+                            return acc;
+                        },[]),
+                auth: state.auth,
+                showEditMod : false
+                }
+            ))
+            console.error(error, "Error saving edit");
+        });
     }
 
     componentDidMount() {
@@ -83,13 +103,11 @@ class ViewOrders extends Component {
         setTimeout(() => {
             if ( !this.props.auth.token ) { //Redirect if token not found, otherwise load page
                this.setState({ blockPage: true })
-            } else {
-               this.setState({ loading: false })
             }
-        },250);
+        },150);
     }
 
-    deleteOrder = ({_id}) => {
+    deleteOrder = ({_id}, index, original) => {
         this.setState((state,props) => (
            {
             showOrders: state.showOrders,
@@ -110,7 +128,18 @@ class ViewOrders extends Component {
         })
         .then(res => res.json())
         .then(response => console.log("Success", JSON.stringify(response)))
-        .catch(error => console.error(error));
+        .catch((error) => {
+            //If error restore order item to original indexed position
+            this.setState((state,props) => (
+               {
+                showOrders: state.showOrders,
+                orders: [ ...state.orders.slice(0,index), ...[original], ...state.orders.slice(index) ],
+                auth: state.auth,
+                showEditMod : false
+                }
+            ))         
+            console.error(error, "Error deleting order");
+        });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -136,17 +165,13 @@ class ViewOrders extends Component {
         }
         return (
             <div>
-            { this.state.loading ?
-                <div></div>
-                :
-                <div>
                 {
                     this.state.showEditMod &&
                     <EditOrder passedFunction={this.passedFunction} orderItem={state.orderItem} saveEdit={this.saveEdit}></EditOrder>
                 }
                 <Template>
                     <div className="container-fluid">
-                        {this.state.orders.map(order => {
+                        {this.state.orders.map((order,index) => {
                             return (
                                 <div className="row view-order-container" key={order._id}>
                                     <div className="col-md-4 view-order-left-col p-3">
@@ -159,15 +184,13 @@ class ViewOrders extends Component {
                                      </div>
                                      <div className="col-md-4 view-order-right-col">
                                          <button onClick={() => this.editOrder(order)} className="btn btn-success">Edit</button>
-                                         <button onClick={() => this.deleteOrder(order)} className="btn btn-danger">Delete</button>
+                                         <button onClick={() => this.deleteOrder(order, index, order)} className="btn btn-danger">Delete</button>
                                      </div>
                                 </div>
                             );
                         })}
                     </div>
                 </Template>
-                </div>
-            }
             </div>
         );
     }
