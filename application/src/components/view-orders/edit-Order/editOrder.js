@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { SERVER_IP } from '../../../private';
 import { formatDate } from '../../../utils/utils';
 import '../viewOrders.css';
-
-const mapStateToProps = (state) => ({
-    auth: state.auth,
-})
 
 class EditOrder extends Component {
     constructor(props) {
