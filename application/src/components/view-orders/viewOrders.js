@@ -3,24 +3,70 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Template } from '../../components';
 import { SERVER_IP } from '../../private';
+import EditOrder from './edit-Order/editOrder';
+import { formatDate } from '../../utils/utils';
 import './viewOrders.css';
+
+const EDIT_ORDER_URL = `${SERVER_IP}/api/edit-order`;
 
 class ViewOrders extends Component {
     state = {
-        blockPage: false,
         loading: true,
+        blockPage: false,
+        showEditMod:false,
         orders: [],
         auth: {
             email: null,
             token: null
-        }
+        },
+        orderItem: {}
+
     }
 
-    formatDate = (dayTime = new Date()) => {  //Return date with two digit minutes and seconds ie. hh:mm:ss format
-        let tempDayTime = new Date(dayTime);
-        return tempDayTime.getHours() + ':' +
-            ( !!(tempDayTime.getMinutes() > 9 ) ? tempDayTime.getMinutes() : ( '0' + tempDayTime.getMinutes() ) ) + ':' +
-            ( !!(tempDayTime.getSeconds() > 9 ) ? tempDayTime.getSeconds() : ( '0' + tempDayTime.getSeconds() ) );
+    passedFunction = () => {
+        this.setState({ showEditMod : false,  })
+    }
+
+    editOrder(obj) {
+        this.setState({ orderItem:obj,  showEditMod : true })
+    }
+
+    saveEdit = ({  id, ordered_by, quantity, order_item }) => {
+        this.setState((state,props) => (
+           {
+            showOrders: state.showOrders,
+            orders: state.orders
+                        .reduce((acc,it) => {
+                            if (it._id === id) {
+                                acc.push( Object.assign(
+                                    it,
+                                    { _id: id, quantity, order_item }
+                                ))
+                            } else {
+                                acc.push(it);
+                            }
+                            return acc;
+                        },[]),
+            auth: state.auth,
+            showEditMod : false
+            }
+        ))
+
+        fetch(EDIT_ORDER_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                id,
+                order_item,
+                quantity,
+                ordered_by,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(response => console.log("Success", JSON.stringify(response)))
+        .catch(error => console.error(error));
     }
 
     componentDidMount() {
@@ -42,6 +88,7 @@ class ViewOrders extends Component {
                this.setState({ loading: false })
             }
         },250);
+
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -61,7 +108,7 @@ class ViewOrders extends Component {
 
 
     render() {
-        const { formatDate, state } = this
+        const { state } = this
         if (!!state.blockPage) {
             return <Redirect to="/" />
         }
@@ -70,6 +117,11 @@ class ViewOrders extends Component {
             { this.state.loading ?
                 <div></div>
                 :
+                <div>
+                {
+                    this.state.showEditMod &&
+                    <EditOrder passedFunction={this.passedFunction} orderItem={state.orderItem} saveEdit={this.saveEdit}></EditOrder>
+                }
                 <Template>
                     <div className="container-fluid">
                         {this.state.orders.map(order => {
@@ -84,7 +136,7 @@ class ViewOrders extends Component {
                                         <p>Quantity: {order.quantity}</p>
                                      </div>
                                      <div className="col-md-4 view-order-right-col">
-                                         <button className="btn btn-success">Edit</button>
+                                         <button onClick={() => this.editOrder(order)} className="btn btn-success">Edit</button>
                                          <button className="btn btn-danger">Delete</button>
                                      </div>
                                 </div>
@@ -92,6 +144,7 @@ class ViewOrders extends Component {
                         })}
                     </div>
                 </Template>
+                </div>
             }
             </div>
         );

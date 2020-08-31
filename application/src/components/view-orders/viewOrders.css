@@ -1,3 +1,30 @@
+.editItemMod {
+    background-color: white;
+    border-radius:4px;
+    width: 700px;
+    height:400px;
+    z-index:3;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.editItemMod button {
+    bottom:0;
+    margin:5px;
+    margin-top:60px;
+    margin-bottom:20px;
+
+}
+
+.editModBlur {
+    position:absolute;
+    backdrop-filter: blur(4px);
+    z-index:2;
+    height:100vh;
+    width:100vw;
+}
+
 .view-order-container {
     font-family: "Optima", serif;
     min-height: 100px;
